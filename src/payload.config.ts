@@ -20,6 +20,7 @@ import {
 } from "@/lib/collections";
 import { defaultLexical } from "@/lib/collections/fields/base-fields";
 import appConfig from "@/lib/core/config";
+import { postgresPoolOptions } from "@/lib/core/postgres-pool";
 import { plugins } from "@/lib/providers/plugins";
 
 export default buildConfig({
@@ -62,10 +63,10 @@ export default buildConfig({
   db: postgresAdapter({
     schemaName: appConfig.DATABASE_SCHEMA,
     disableCreateDatabase: true,
-    pool: {
-      connectionString: appConfig.DATABASE_URL,
-      max: appConfig.DATABASE_POOL_MAX,
-    },
+    pool: postgresPoolOptions(
+      appConfig.DATABASE_URL,
+      appConfig.DATABASE_POOL_MAX,
+    ),
   }),
 
   collections: [

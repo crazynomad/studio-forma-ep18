@@ -41,6 +41,10 @@
 
 不启用 SMTP 时，重置密码邮件和表单邮件不会送达。SMTP 配置见 `.env.example`，不要将示例占位值上传到云端。
 
+## 数据库证书
+
+官方集成注入的 Postgres URL 使用 TLS，但 Node 不自动信任 Supabase 的私有 CA。`src/lib/core/postgres-pool.ts` 为官方 Supabase 主机加载公开 CA，并保持证书链和主机名校验。证书来自项目 Database Settings 的 Download certificate，指纹 `807025ad50d4ed219d2c9c7d299c004f824eb00cf7f65afef607d07b72e6cafa`。不要用 `rejectUnauthorized: false` 或 `NODE_TLS_REJECT_UNAUTHORIZED=0` 跳过验证。
+
 ## 图片初始化
 
 `deployment-media/` 仅包含这套演示网站使用的 29 张公开展示图片及校验清单，不含数据库备份或账号。构建前 `scripts/bootstrap-storage.mjs` 使用平台注入的密钥创建图片 bucket 并上传；遇到已存在的对象跳过，不覆盖后台改过的文件，也不改已有私有 bucket 的权限。后台新上传图片由 Payload 的服务端适配器写入 Supabase Storage。原 S3 / Vercel Blob 接口仍可选。
