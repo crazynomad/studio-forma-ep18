@@ -2,25 +2,30 @@
 
 目标架构：Vercel 运行 Next.js 和 Payload 后台；Supabase Postgres 保存文章、草稿、版本及后台用户；Supabase Storage 保存图片。后台登录仍由 Payload 管理。
 
-## 2026-11-06 Git 路线预演
+## 已完成的云端验收（2026-11-06）
 
-- 修改版源码已整理为 `crazynomad/studio-forma-ep18`，正在验证官方 Supabase Marketplace 集成和 Git 自动部署。
-- 已补服务端 `POSTGRES_URL` 兼容，沿用集成自动注入的数据库连接；显式 `DATABASE_URL` 仍优先。
-- 集成的协议接受、账号授权和额外敏感配置由本人处理。新增源码不包含本地环境文件、数据库或备份。
-- 已通过官方 MCP 导入独立的 payload schema，保留 5 篇文章（4 篇已发布、1 篇草稿）；云端构建与后台验收仍在进行。下面 2026-11-05 的本地记录不能替代云端结果。
+[演示网站](https://studio-forma-greentrain.vercel.app) 已上线。Vercel Hobby + Supabase Free，个人学习演示；原本地实例保留。
 
-## 原本地准备记录（2026-11-05）
+- Vercel、Supabase 官方 MCP 均已实际调用。Vercel Git 推送自动构建成功，另由 MCP 再部署一次检验持久化。
+- 独立 `payload` schema 共 80 张表，原 5 篇文章保留（4 已发布、1 草稿）；29 张演示图片已迁到 Supabase Storage，逐个校验一致。
+- 15 项云端检查通过，覆盖前台、后台登录、错误密码、匿名隔离、存草稿、修改、发布及上传图片。认证 cookie 为 HttpOnly、Secure、SameSite=Lax。
+- 新建草稿和图片后重新部署，再核对两者仍在且草稿仍私有；仅清理此次临时测试内容，原 5 篇文章保留。
+- 未配置 SMTP；邮件发送、真实手机／跨网络尚未验证。该记录不是从全新空白项目自动生成同一套内容的验证。
 
-- Vercel Hobby 项目已创建并关联：`crazynomads-projects/studio-forma-greentrain`。
-- 目标域名已由 Vercel 确认：`studio-forma-greentrain.vercel.app`，尚未部署。
-- 原本地数据库和图片保留；完整备份位于 `.local/backups/`，入口为 `.local/latest-backup.json`。
-- 已恢复独立的本地迁移副本，CMS 表移入 `payload` schema，原数据库未修改。
-- 迁移副本已更换默认后台密码、隐藏演示重置页并清理首页的演示登录信息；原 5 篇文章及发布/草稿状态保留。
-- Supabase 项目创建、云端导入、图片上传、Vercel 部署及线上验收仍待完成。
+## 跟做导航：准备 → 连接 → 部署 → 验收
 
-本地演练验证：文章及历史版本的 5 张表逐行一致；新后台密码可登录，旧默认密码被拒绝；匿名用户看不到草稿及重置页；Supabase S3 模式可生成正确的媒体路径。`pnpm typecheck`、修改文件的 ESLint、生产构建均通过，本地 `/blog` 返回 200，`/preview/reset` 返回 404。
+1. **准备自己的源码和内容。** Fork / clone 本仓库，使用 Node 24 与锁文件安装依赖。此流程针对已有本地 Payload 网站上线；先备份自己的数据库和图片。源码库不包含演示后台账号、数据库备份或这 5 篇文章的私有数据库快照。不要对已有数据运行 `pnpm seed` / `pnpm reset`；从零建站需要另做新库初始化与内容创建。
+2. **本人连接账号和免费服务。** 用 GitHub 登录 Vercel、授权自己的仓库；通过官方 Supabase Marketplace 集成创建 Free 项目、接受协议，只连 Production、保留 Sensitive、不启用收费数据库分支。本人授权 `https://mcp.vercel.com` 与 `https://mcp.supabase.com/mcp?project_ref=<自己的项目>&features=database,debugging,storage,docs`。Vercel 可能另要求所属团队授权。
+3. **Agent 配置和迁移。** 使用下方变量名称表；官方集成自动注入数据库和 Storage 服务端凭据，不读取或复制其明文。独立生成 Payload / Preview 随机密钥，程序直接写平台。按迁移段落只导入自己的空 `payload` schema，保持对 anon / authenticated 不开放，并核对图片关联。Agent 运行类型检查、提交并推送，等待 Vercel 的实际部署状态 Ready。
+4. **打开自己的网址验收。** 后台登录、存草稿、改内容、发布、上传图片；无痕窗口只见已发布内容，不能创建管理员或访问重置入口。再次部署后验证文章与上传图片仍在。本人补真实手机／不同网络检查。
 
-`.local/`、环境文件、备份和本地图片均排除出 Vercel 上传包。不要将任何密码或数据库备份提交到 Git。
+可给 Agent 的任务：
+
+```text
+帮我把这个已有的 Payload 网站迁到我确认的 Vercel + Supabase Free 项目，优先使用官方 MCP。先核对账号、目标仓库和空数据库，保留原实例和备份。
+凭据留在平台官方集成里，不读取、打印、截图或提交真实值。私有 CMS 表与公开图片分开，不能暴露草稿和后台身份。遇到收费项停下说明，不升级。
+按照本文件核对 Node、数据库 CA、变量和 Storage，执行迁移后用 Git 部署。验证后台编辑发布、匿名权限及重部署持久化，给我网址和未验证项。
+```
 
 ## 云端环境变量
 
@@ -55,7 +60,7 @@
 2. 三个媒体集合的现有记录补上 `prefix` 和 `_objectkey` 字段。对象路径分别是 `payload_cms/media/`、`payload_cms/seo-media/`、`payload_cms/gallery-media/`；保留原文件名、衍生尺寸及关联 ID。
 3. HTML 中的外链图片也下载、校验并上传到 `payload_cms/external/`，再更新迁移副本中的引用。
 4. 为新项目导入前确认目标 `payload` schema 为空；按事务恢复，核对每张表行数、文章状态以及图片哈希。
-5. 将敏感变量写入 Vercel 的 encrypted 环境变量，部署后验证首页、博客、图片、后台登录、草稿预览、发布及重新编辑。确认默认密码失效、匿名用户看不到草稿、`/preview/reset` 返回 404。
+5. 将应用敏感变量写入 Vercel 的 Sensitive 环境变量，数据库／Storage 凭据优先由官方集成注入，部署后验证首页、博客、图片、后台登录、草稿预览、发布及重新编辑。确认默认密码失效、匿名用户看不到草稿、`/preview/reset` 返回 404。
 
 原模板的公开重置接口已停用；需要重置时，必须明确从本地执行管理命令。
 
