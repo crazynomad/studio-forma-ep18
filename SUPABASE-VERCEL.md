@@ -2,7 +2,14 @@
 
 目标架构：Vercel 运行 Next.js 和 Payload 后台；Supabase Postgres 保存文章、草稿、版本及后台用户；Supabase Storage 保存图片。后台登录仍由 Payload 管理。
 
-## 当前进度（2026-11-05）
+## 2026-11-06 Git 路线预演
+
+- 修改版源码已整理为 `crazynomad/studio-forma-ep18`，正在验证官方 Supabase Marketplace 集成和 Git 自动部署。
+- 已补服务端 `POSTGRES_URL` 兼容，沿用集成自动注入的数据库连接；显式 `DATABASE_URL` 仍优先。
+- 集成的协议接受、账号授权和额外敏感配置由本人处理。新增源码不包含本地环境文件、数据库或备份。
+- 云端数据导入、Storage 图片与真实后台验收仍待完成，下面 2026-11-05 的本地记录不能替代云端结果。
+
+## 原本地准备记录（2026-11-05）
 
 - Vercel Hobby 项目已创建并关联：`crazynomads-projects/studio-forma-greentrain`。
 - 目标域名已由 Vercel 确认：`studio-forma-greentrain.vercel.app`，尚未部署。
@@ -22,7 +29,7 @@
 | `NEXT_PUBLIC_SITE_NAME` | `Studio Forma` |
 | `NEXT_PUBLIC_LANG` | `en` |
 | `NEXT_PUBLIC_BASE_URL` / `NEXT_PUBLIC_SERVER_URL` | 最终 HTTPS 网站地址 |
-| `DATABASE_URL` | Supabase pooler 连接串；迁移使用 session pooler，运行时可用 transaction pooler |
+| `DATABASE_URL` / `POSTGRES_URL` | 显式 DATABASE_URL 优先；官方 Vercel 集成的 POSTGRES_URL 可直接用于服务端。迁移使用 session pooler，运行时连接方式需按实际配置核对 |
 | `DATABASE_SCHEMA` | `payload`，不加入 Supabase Data API exposed schemas |
 | `DATABASE_POOL_MAX` | `3`，每个函数实例的连接上限 |
 | `PAYLOAD_SECRET` / `PREVIEW_SECRET` | 分别生成随机值；不得复用演示配置 |
