@@ -1,0 +1,8 @@
+.local/
+.git/
+.env
+.env.*
+!.env.example
+public/images/
+LOCAL-DEMO.md
+AGENTS.md
