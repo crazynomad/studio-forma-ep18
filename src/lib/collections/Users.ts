@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { adminOnlyAccess } from "@/lib/collections/fields/base-fields";
+import appConfig from "@/lib/core/config";
 
 export const Users: CollectionConfig = {
   slug: "users",
@@ -9,7 +10,12 @@ export const Users: CollectionConfig = {
     defaultColumns: ["name", "email"],
     useAsTitle: "name",
   },
-  auth: true,
+  auth: {
+    cookies: {
+      secure: appConfig.BASE_URL?.startsWith("https://") ?? false,
+      sameSite: "Lax",
+    },
+  },
   fields: [
     {
       name: "name",
