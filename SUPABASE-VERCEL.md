@@ -7,7 +7,7 @@
 - 修改版源码已整理为 `crazynomad/studio-forma-ep18`，正在验证官方 Supabase Marketplace 集成和 Git 自动部署。
 - 已补服务端 `POSTGRES_URL` 兼容，沿用集成自动注入的数据库连接；显式 `DATABASE_URL` 仍优先。
 - 集成的协议接受、账号授权和额外敏感配置由本人处理。新增源码不包含本地环境文件、数据库或备份。
-- 云端数据导入、Storage 图片与真实后台验收仍待完成，下面 2026-11-05 的本地记录不能替代云端结果。
+- 已通过官方 MCP 导入独立的 payload schema，保留 5 篇文章（4 篇已发布、1 篇草稿）；云端构建与后台验收仍在进行。下面 2026-11-05 的本地记录不能替代云端结果。
 
 ## 原本地准备记录（2026-11-05）
 
@@ -33,15 +33,17 @@
 | `DATABASE_SCHEMA` | `payload`，不加入 Supabase Data API exposed schemas |
 | `DATABASE_POOL_MAX` | `3`，每个函数实例的连接上限 |
 | `PAYLOAD_SECRET` / `PREVIEW_SECRET` | 分别生成随机值；不得复用演示配置 |
-| `STORAGE_PROVIDER` | `s3` |
-| `S3_BUCKET` | 独立的公开图片 bucket |
-| `S3_ENDPOINT` | Supabase 提供的 S3 endpoint |
-| `S3_REGION` | Supabase 项目的实际区域 |
-| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Storage S3 凭证，只放服务端环境变量 |
+| `STORAGE_PROVIDER` | `supabase`，复用官方集成注入的服务端变量 |
+| `SUPABASE_STORAGE_BUCKET` | `studio-media`，专用于公开演示图片 |
+| `SUPABASE_URL` / `SUPABASE_SECRET_KEY` | 官方 Marketplace 集成自动注入；只由服务端使用，不复制给 Agent |
 | `BUCKET_PREFIX` | `payload_cms` |
 | `NEXT_PUBLIC_STORAGE_URL` | `https://<ref>.supabase.co/storage/v1/object/public/<bucket>` |
 
 不启用 SMTP 时，重置密码邮件和表单邮件不会送达。SMTP 配置见 `.env.example`，不要将示例占位值上传到云端。
+
+## 图片初始化
+
+`deployment-media/` 仅包含这套演示网站使用的 29 张公开展示图片及校验清单，不含数据库备份或账号。构建前 `scripts/bootstrap-storage.mjs` 使用平台注入的密钥创建图片 bucket 并上传；遇到已存在的对象跳过，不覆盖后台改过的文件，也不改已有私有 bucket 的权限。后台新上传图片由 Payload 的服务端适配器写入 Supabase Storage。原 S3 / Vercel Blob 接口仍可选。
 
 ## 迁移与验收
 

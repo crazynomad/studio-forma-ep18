@@ -1,6 +1,6 @@
 type AppLocale = "en" | "he";
 
-type StorageProvider = "vercel" | "s3";
+type StorageProvider = "vercel" | "s3" | "supabase";
 
 type LocaleConfig = {
   lang: AppLocale;
@@ -51,6 +51,10 @@ export type AppConfig = {
   S3_ACCESS_KEY_ID: string;
   S3_SECRET_ACCESS_KEY: string;
 
+  SUPABASE_URL: string;
+  SUPABASE_SECRET_KEY: string;
+  SUPABASE_STORAGE_BUCKET: string;
+
   EMAIL_FROM_ADDRESS: string;
   EMAIL_FROM_NAME: string;
   EMAIL_SMTP_HOST: string;
@@ -75,7 +79,8 @@ export const appConfig: AppConfig = {
     (process.env.NEXT_PUBLIC_LANG as AppLocale) ?? "en"
   ] as LocaleConfig,
   // The Supabase Vercel integration supplies POSTGRES_URL server-side.
-  DATABASE_URL: (process.env.DATABASE_URL || process.env.POSTGRES_URL) as string,
+  DATABASE_URL: (process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL) as string,
   DATABASE_SCHEMA: process.env.DATABASE_SCHEMA || "public",
   DATABASE_POOL_MAX: Number(process.env.DATABASE_POOL_MAX || 3),
 
@@ -94,6 +99,13 @@ export const appConfig: AppConfig = {
   S3_REGION: process.env.S3_REGION || "auto",
   S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID as string,
   S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY as string,
+
+  SUPABASE_URL: (process.env.SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL) as string,
+  SUPABASE_SECRET_KEY: (process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY) as string,
+  SUPABASE_STORAGE_BUCKET:
+    process.env.SUPABASE_STORAGE_BUCKET || "studio-media",
 
   EMAIL_FROM_ADDRESS: process.env.EMAIL_FROM_ADDRESS as string,
   EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME as string,

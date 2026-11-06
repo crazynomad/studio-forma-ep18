@@ -16,6 +16,7 @@ import {
 import appConfig from "@/lib/core/config";
 import { CollectionName } from "@/lib/core/types/types";
 import { adminTranslationsPlugin } from "@/lib/intl/admin";
+import { supabaseStorage } from "@/lib/providers/supabase-storage";
 
 const generateTitle: GenerateTitle<Blog | Page> = ({ doc }) => doc.title;
 
@@ -67,7 +68,9 @@ const getS3CollectionOptions = (collection: UploadCollection) => ({
   },
 });
 
-if (appConfig.STORAGE_PROVIDER === "vercel") {
+if (appConfig.STORAGE_PROVIDER === "supabase") {
+  storagePlugin = supabaseStorage();
+} else if (appConfig.STORAGE_PROVIDER === "vercel") {
   storagePlugin = vercelBlobStorage({
     enabled: !!appConfig.BLOB_READ_WRITE_TOKEN,
     token: appConfig.BLOB_READ_WRITE_TOKEN,
